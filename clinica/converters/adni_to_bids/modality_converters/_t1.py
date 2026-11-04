@@ -102,15 +102,15 @@ def _compute_t1_paths(
 
     from .._utils import load_clinical_csv
     from ._image_path_utils import find_image_path
+    from ._t1_utils import load_all_images_metadata
     from ._visits_utils import visits_to_timepoints
 
     t1_dfs_list = []
     t1_df = _initialize_t1_df()
+    all_images = load_all_images_metadata(csv_dir)
     adni_merge = load_clinical_csv(csv_dir, "ADNIMERGE")
-    mprage_meta = load_clinical_csv(csv_dir, "MPRAGEMETA")
     mri_quality = load_clinical_csv(csv_dir, "MRIPROT")
     mayo_mri_qc = load_clinical_csv(csv_dir, "MAYOADIRL_MRI_IMAGEQC_05_07_15")
-    mri_qc = load_clinical_csv(csv_dir, "MRIQC")
 
     # Keep only T1 scans
     mayo_mri_qc = mayo_mri_qc[mayo_mri_qc.series_type == "T1"]
@@ -121,8 +121,8 @@ def _compute_t1_paths(
         adnimerge_subj = adni_merge[adni_merge.PTID == subject]
         adnimerge_subj = adnimerge_subj.sort_values("EXAMDATE")
 
-        mprage_meta_subj = mprage_meta[mprage_meta.SubjectID == subject]
-        mprage_meta_subj = mprage_meta_subj.sort_values("ScanDate")
+        all_images_subj = all_images[all_images.SubjectID == subject]
+        all_images_subj = all_images_subj.sort_values("image_date")
 
         mri_quality_subj = mri_quality[mri_quality.RID == int(subject[-4:])]
         mayo_mri_qc_subj = mayo_mri_qc[mayo_mri_qc.RID == int(subject[-4:])]
@@ -130,7 +130,7 @@ def _compute_t1_paths(
         # Obtain corresponding timepoints for the subject visits
         visits = visits_to_timepoints(
             subject=subject,
-            mri_list_subj=mprage_meta_subj,
+            mri_list_subj=all_images_subj,
             adnimerge_subj=adnimerge_subj,
             modality="T1",
             visit_field="Visit",

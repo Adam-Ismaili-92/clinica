@@ -42,7 +42,7 @@ def visits_to_timepoints(
     for adni_row in adnimerge_subj.iterrows():
         visit = adni_row[1]
         study = ADNIStudy(visit.ORIGPROT)
-        preferred_visit_name = _get_preferred_visit_name(study, visit.VISCODE)
+        preferred_visit_name = _get_preferred_visit_name(study, visit.VISCODE2)
 
         if preferred_visit_name in unique_visits:
             key_preferred_visit = (visit.VISCODE, visit.COLPROT, visit.ORIGPROT)

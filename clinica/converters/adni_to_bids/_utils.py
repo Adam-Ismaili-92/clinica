@@ -240,7 +240,7 @@ def _filter_subj_bids(
     # preprocess the column that contains the subjects ids.
     # todo : use id class here ?
     bids_ids = [x[8:] for x in bids_ids if "sub-ADNI" in x]
-    if location == "ADNIMERGE.csv":
+    if "ADNIMERGE" in location:
         df_files["RID"] = df_files["PTID"].apply(
             lambda x: _remove_space_and_symbols(x)[4:]
         )
@@ -418,7 +418,7 @@ def create_adni_sessions_dict(
             # Filter rows with invalid session IDs.
             df_filtered.dropna(subset="session_id", inplace=True)
 
-            if location == "ADNIMERGE.csv":
+            if "ADNIMERGE" in location:
                 df_filtered["AGE"] = df_filtered.apply(lambda x: _update_age(x), axis=1)
             df_subj_session = _update_sessions_df(
                 df_subj_session, df_filtered, df_sessions, location
