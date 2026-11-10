@@ -324,8 +324,8 @@ def _get_last_processed_scan_for_visit(
 
     Parameters
     ----------
-    mprage_meta_subj : pd.DataFrame
-        A DataFrame of MPRAGE metadata of images corresponding to the subject.
+    all_images_subj : pd.DataFrame
+        A DataFrame of all user selected images metadata corresponding to the subject.
 
     timepoint : str
         The viscode.
@@ -374,8 +374,8 @@ def _select_preferred_scan_for_subject_in_adni3(
     timepoint : str
         A string of visit code in months.
 
-    mprage_meta_subj : pd.DataFrame
-        A DataFrame of MPRAGE metadata of images corresponding to the subject.
+    all_images_subj : pd.DataFrame
+        A DataFrame of all user selected images metadata corresponding to the subject.
 
     mayo_mri_qc_subj : pd.DataFrame
         A DatFrame of MAYO Clinic MR image quality of images corresponding to the subject.
