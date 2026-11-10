@@ -119,7 +119,9 @@ def _compute_flair_paths(
     ]
     for subject in subjects:
         # Filter ADNIMERGE, MRI_LIST and QC for only one subject and sort the rows/visits by examination date
-        all_images_subj = all_images[all_images.subject_id == subject]
+        all_images_subj = all_images[
+            (all_images.subject_id == subject) & (all_images.modality == "MRI")
+        ]
         all_images_subj = all_images_subj.sort_values("image_date")
 
         mayo_mri_qc_subj = mayo_mri_qc[mayo_mri_qc.RID == int(subject[-4:])]
@@ -140,9 +142,7 @@ def _compute_flair_paths(
     if not flair_df.empty:
         error_ind = flair_df.index[
             flair_df.apply(
-                lambda x: (
-                    (x.subject_id, x.image_visit) in _get_known_conversion_errors()
-                ),
+                lambda x: ((x.Subject_ID, x.VISCODE) in _get_known_conversion_errors()),
                 axis=1,
             )
         ]

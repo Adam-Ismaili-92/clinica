@@ -132,7 +132,9 @@ def compute_fmap_path(
 
     for subj in subjs_list:
         # Filter ADNIMERGE, MRI_LIST and QC for only one subject and sort the rows/visits by examination date
-        all_images_subj = all_images[all_images.subject_id == subj]
+        all_images_subj = all_images[
+            (all_images.subject_id == subj) & (all_images.modality == "MRI")
+        ]
         all_images_subj = all_images_subj.sort_values("image_date")
 
         mayo_mri_qc_subj = mayo_mri_qc[mayo_mri_qc.RID == int(subj[-4:])]
@@ -202,7 +204,7 @@ def compute_fmap_path(
     if not fmap_df.empty:
         error_ind = fmap_df.index[
             fmap_df.apply(
-                lambda x: ((x.subject_id, x.image_visit) in conversion_errors), axis=1
+                lambda x: ((x.Subject_ID, x.VISCODE) in conversion_errors), axis=1
             )
         ]
         fmap_df.drop(error_ind, inplace=True)

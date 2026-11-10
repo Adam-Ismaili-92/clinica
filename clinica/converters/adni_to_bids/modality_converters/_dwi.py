@@ -138,9 +138,7 @@ def _compute_dwi_paths(
     if not dwi_df.empty:
         error_ind = dwi_df.index[
             dwi_df.apply(
-                lambda x: (
-                    (x.subject_id, x.image_visit) in _get_known_conversion_errors()
-                ),
+                lambda x: ((x.Subject_ID, x.VISCODE) in _get_known_conversion_errors()),
                 axis=1,
             )
         ]

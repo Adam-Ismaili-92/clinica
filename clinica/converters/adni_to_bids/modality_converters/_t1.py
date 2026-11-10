@@ -117,7 +117,9 @@ def _compute_t1_paths(
     for subject in subjects:
         # Filter ADNIMERGE, MPRAGE METADATA and QC for only one subject and sort the rows/visits by examination date
 
-        all_images_subj = all_images[all_images.subject_id == subject]
+        all_images_subj = all_images[
+            (all_images.subject_id == subject) & (all_images.modality == "MRI")
+        ]
         all_images_subj = all_images_subj.sort_values("image_date")
 
         mri_quality_subj = mri_quality[mri_quality.RID == int(subject[-4:])]
@@ -145,13 +147,20 @@ def _compute_t1_paths(
                     mayo_mri_qc_subj=mayo_mri_qc_subj,
                 )
             elif cohort == "ADNI4":
-                selected_scan = _select_scan_no_qc(all_images_subj)
+                selected_scan = _select_preferred_scan_for_subject_in_adni4(
+                    subject_id=subject,
+                    timepoint=timepoint,
+                    all_images_subj=all_images_subj,
+                )
             else:
                 cprint(
                     f"Subject {subject} visit {timepoint} belongs to an unknown cohort: {cohort}"
                 )
             if selected_scan is not None:
                 t1_dfs_list.append(pd.DataFrame(selected_scan, index=["i"]))
+                if "Subject_ID" not in selected_scan:
+                    print("SELECTED SCAN: \n", selected_scan)
+                    print("SUBJECT: ", subject, "VISCODE: ", timepoint)
     if t1_dfs_list:
         t1_df = pd.concat(t1_dfs_list, ignore_index=True)
 
@@ -387,7 +396,7 @@ def _select_preferred_scan_for_subject_in_adni3(
     from clinica.utils.stream import cprint
 
     filtered_scan = all_images_subj[
-        (all_images_subj["phase"] == "Original")
+        (all_images_subj["image_type"] == "Original")
         & (all_images_subj.image_visit == timepoint)
         & all_images_subj.image_description.str.contains("Accel", case=False, na=False)
         & ~all_images_subj.image_description.str.lower().str.endswith("_nd", na=False)
@@ -398,6 +407,60 @@ def _select_preferred_scan_for_subject_in_adni3(
     scan = _select_scan_from_qc(
         filtered_scan, mayo_mri_qc_subj, preferred_field_strength=3.0
     )
+    sequence = replace_special_characters_with_symbol(
+        scan.image_description, symbol="_"
+    )
+
+    return {
+        "Subject_ID": subject_id,
+        "VISCODE": timepoint,
+        "Sequence": sequence,
+        "Scan_Date": scan.image_date,
+        "Study_ID": str(scan.study_id),
+        "Series_ID": str(scan.series_id),
+        "Image_ID": str(scan.image_id),
+        "Field_Strength": scan.MagneticFieldStrength,
+        "Original": True,
+    }
+
+
+def _select_preferred_scan_for_subject_in_adni4(
+    subject_id: str,
+    timepoint: str,
+    all_images_subj: pd.DataFrame,
+) -> Optional[dict[str, Any]]:
+    """Select the preferred scan for a subject in a visit, given the subject belongs to ADNI 3 cohort.
+
+    Parameters
+    ----------
+    subject_id : str
+        A string containing subject ID.
+
+    timepoint : str
+        A string of visit code in months.
+
+    all_images_subj : pd.DataFrame
+        A DataFrame of all user selected images metadata corresponding to the subject.
+
+    Returns
+    -------
+    dict or None :
+        Dictionary containing selected scan information.
+        Returns None if no scan found.
+    """
+    from clinica.utils.filemanip import replace_special_characters_with_symbol
+    from clinica.utils.stream import cprint
+
+    filtered_scan = all_images_subj[
+        (all_images_subj["image_type"] == "Original")
+        & (all_images_subj.image_visit == timepoint)
+        & all_images_subj.image_description.str.contains("Accel", case=False, na=False)
+        & ~all_images_subj.image_description.str.lower().str.endswith("_nd", na=False)
+    ]
+    if filtered_scan.empty:
+        cprint(f"NO MPRAGE Meta for ADNI4: {subject_id} for visit {timepoint}")
+        return None
+    scan = _select_scan_no_qc(filtered_scan)
     sequence = replace_special_characters_with_symbol(
         scan.image_description, symbol="_"
     )

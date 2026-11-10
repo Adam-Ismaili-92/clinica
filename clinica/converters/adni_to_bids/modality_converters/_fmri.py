@@ -129,7 +129,7 @@ def _compute_fmri_path(
     all_images = load_all_images_metadata(csv_dir)
 
     # Selecting fMRI images
-    all_images = all_images[all_images.modality.str.contains("MRI")]
+    all_images = all_images[all_images.modality.str.contains("fMRI")]
     unwanted_sequences = [] if convert_multiband else ["MB"]
     all_images = all_images[
         all_images.image_description.map(
@@ -158,9 +158,7 @@ def _compute_fmri_path(
     if not fmri_df.empty:
         error_ind = fmri_df.index[
             fmri_df.apply(
-                lambda x: (
-                    (x.subject_id, x.image_visit) in _get_known_conversion_errors()
-                ),
+                lambda x: ((x.Subject_ID, x.VISCODE) in _get_known_conversion_errors()),
                 axis=1,
             )
         ]
@@ -253,7 +251,7 @@ def _select_fmri_image(
         "Sequence": replace_special_characters_with_symbol(
             selected_scan.image_description, symbol="_"
         ),
-        "Scan_Date": selected_scan["SCANDATE"],
+        "Scan_Date": selected_scan["image_date"],
         "Study_ID": str(int(selected_scan.study_id)),
         "Series_ID": str(int(selected_scan.series_id)),
         "Image_ID": str(int(selected_scan.image_id)),
