@@ -21,7 +21,9 @@ def load_all_images_metadata(csv_dir: Path) -> pd.DataFrame:
     mriqc = load_clinical_csv(csv_dir, "MRIQC")
 
     all_images = all_images.merge(
-        mriqc[["image_id", "LONISeries"]], on="image_id", how="left"
+        mriqc[["image_id", "LONISeries", "MagneticFieldStrength"]],
+        on="image_id",
+        how="left",
     )
 
     all_images = all_images.rename(columns={"LONISeries": "series_id"})
