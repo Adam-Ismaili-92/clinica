@@ -99,7 +99,6 @@ def _compute_dwi_paths(
     dwi_df = _initialize_dwi_df()
     dwi_dfs_list = []
     # Loading needed .csv files
-    adni_merge = load_clinical_csv(csv_dir, "ADNIMERGE")
     mayo_mri_qc = load_clinical_csv(csv_dir, "MAYOADIRL_MRI_IMAGEQC_05_07_15")
     mayo_mri_qc = mayo_mri_qc[mayo_mri_qc.series_type == "DTI"]
     all_images = load_all_images_metadata(csv_dir)
@@ -118,9 +117,6 @@ def _compute_dwi_paths(
     for subject in subjects:
         # Filter ADNIMERGE, MRI_LIST and QC for only one subject and
         # sort the rows/visits by examination date
-        adnimerge_subj = adni_merge[adni_merge.PTID == subject]
-        adnimerge_subj = adnimerge_subj.sort_values("EXAMDATE")
-
         all_images_subj = all_images[all_images.subject_id == subject]
         all_images_subj = all_images_subj.sort_values("image_date")
 

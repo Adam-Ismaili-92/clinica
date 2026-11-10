@@ -110,7 +110,6 @@ def compute_fmap_path(
     ]
     fmap_df = pd.DataFrame(columns=fmap_col)
     fmap_dfs_list = []
-    adni_merge = load_clinical_csv(csv_dir, "ADNIMERGE")
 
     mayo_mri_qc = load_clinical_csv(csv_dir, "MAYOADIRL_MRI_IMAGEQC_05_07_15")
     mayo_mri_qc = mayo_mri_qc[mayo_mri_qc.series_type == "fMRI"]
@@ -133,9 +132,6 @@ def compute_fmap_path(
 
     for subj in subjs_list:
         # Filter ADNIMERGE, MRI_LIST and QC for only one subject and sort the rows/visits by examination date
-        adnimerge_subj = adni_merge[adni_merge.PTID == subj]
-        adnimerge_subj = adnimerge_subj.sort_values("EXAMDATE")
-
         all_images_subj = all_images[all_images.subject_id == subj]
         all_images_subj = all_images_subj.sort_values("image_date")
 

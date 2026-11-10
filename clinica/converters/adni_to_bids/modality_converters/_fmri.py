@@ -115,7 +115,6 @@ def _compute_fmri_path(
 
     fmri_dfs_list = []
     fmri_df = _initialize_fmri_df()
-    adni_merge = load_clinical_csv(csv_dir, "ADNIMERGE")
     mayo_mri_qc = load_clinical_csv(csv_dir, "MAYOADIRL_MRI_IMAGEQC_05_07_15")
     mayo_mri_qc = mayo_mri_qc[mayo_mri_qc.series_type == "fMRI"]
     mayo_mri_qc.columns = [x.upper() for x in mayo_mri_qc.columns]
@@ -140,8 +139,6 @@ def _compute_fmri_path(
     # We will convert the images for each subject in the subject list
     for subject in subjects:
         # Filter ADNIMERGE, MRI_LIST and QC for only one subject and sort the rows/visits by examination date
-        adnimerge_subj = adni_merge[adni_merge.PTID == subject]
-        adnimerge_subj = adnimerge_subj.sort_values("EXAMDATE")
         all_images_subj = all_images[all_images.subject_id == subject]
         all_images_subj = all_images_subj.sort_values("image_date")
         mayo_mri_qc_subj = mayo_mri_qc[mayo_mri_qc.RID == int(subject[-4:])]

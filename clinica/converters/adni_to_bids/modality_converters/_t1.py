@@ -107,7 +107,6 @@ def _compute_t1_paths(
     t1_dfs_list = []
     t1_df = _initialize_t1_df()
     all_images = load_all_images_metadata(csv_dir)
-    adni_merge = load_clinical_csv(csv_dir, "ADNIMERGE")
     mri_quality = load_clinical_csv(csv_dir, "MRIQUALITY")
     mayo_mri_qc = load_clinical_csv(csv_dir, "MAYOADIRL_MRI_IMAGEQC_05_07_15")
 
@@ -117,8 +116,6 @@ def _compute_t1_paths(
     # We will convert the images for each subject in the subject list
     for subject in subjects:
         # Filter ADNIMERGE, MPRAGE METADATA and QC for only one subject and sort the rows/visits by examination date
-        adnimerge_subj = adni_merge[adni_merge.PTID == subject]
-        adnimerge_subj = adnimerge_subj.sort_values("EXAMDATE")
 
         all_images_subj = all_images[all_images.subject_id == subject]
         all_images_subj = all_images_subj.sort_values("image_date")
